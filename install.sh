@@ -41,6 +41,15 @@ timestamp=$(date +%Y%m%d-%H%M%S)
 keepass_path="$target_home/.config/keepassxc/keepassxc.ini"
 keepass_backup=
 
+# Nix path flake references are evaluated independently of Git ownership. URL
+# encoding keeps the reference valid even when the target home contains spaces.
+encoded_install_dir=$(printf '%s' "$install_dir" | sed \
+  -e 's/%/%25/g' \
+  -e 's/ /%20/g' \
+  -e 's/#/%23/g' \
+  -e 's/?/%3F/g')
+flake_ref="path:$encoded_install_dir"
+
 if [ -f "$keepass_path" ]; then
   keepass_backup="$target_home/.local/state/nixos-migration/keepassxc-$timestamp.ini"
   mkdir -p "$(dirname "$keepass_backup")"
@@ -82,7 +91,7 @@ mv "$identity_tmp" "$install_dir/identity.nix"
 
 if [ "${DRY_RUN:-0}" = 1 ]; then
   say "Validating the adapted flake without activating it"
-  nix flake check "path:$install_dir"
+  nix flake check "$flake_ref"
   say "Dry run complete. Adapted configuration: $install_dir"
   exit 0
 fi
@@ -99,10 +108,10 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 
 say "Validating the flake"
-nix flake check "path:$install_dir"
+nix flake check "$flake_ref"
 
 say "Activating NixOS and integrated Home Manager"
-sudo nixos-rebuild switch --flake "path:$install_dir#sahasta"
+sudo nixos-rebuild switch --flake "$flake_ref#sahasta"
 
 if [ -n "$keepass_backup" ]; then
   mkdir -p "$(dirname "$keepass_path")"
