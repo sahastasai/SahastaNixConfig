@@ -20,7 +20,7 @@ hostname, architecture, and current hardware. It installs a working copy at
 The flake output name remains `sahasta` on every machine:
 
 ```sh
-sudo nixos-rebuild switch --flake ~/.config/nixos#sahasta
+sudo nixos-rebuild switch --flake "path:$HOME/.config/nixos#sahasta"
 ```
 
 Set `NIX_CONFIG_DIR` to choose another installation directory. Set
