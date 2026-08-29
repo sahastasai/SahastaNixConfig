@@ -125,6 +125,14 @@ in
     force = true;
   };
 
+  # Hyprland bindings need a stable path regardless of whether Home Manager
+  # installs packages through a standalone or NixOS-integrated profile.
+  home.file.".local/bin/change-brightness" = {
+    source = "${changeBrightness}/bin/change-brightness";
+    executable = true;
+    force = true;
+  };
+
   programs.bash.enable = true;
   programs.zsh = {
     enable = true;
