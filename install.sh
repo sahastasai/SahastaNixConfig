@@ -35,6 +35,52 @@ case $(uname -m) in
   *) fail "Unsupported architecture: $(uname -m)" ;;
 esac
 
+boot_mode=${BOOT_MODE:-}
+if [ -z "$boot_mode" ]; then
+  if [ -d /sys/firmware/efi ]; then
+    boot_mode=uefi
+  else
+    boot_mode=bios
+  fi
+fi
+
+case "$boot_mode" in
+  uefi)
+    efi_sys_mount_point=${EFI_SYS_MOUNT_POINT:-}
+    if [ -z "$efi_sys_mount_point" ]; then
+      for candidate in /boot /boot/efi; do
+        if findmnt -rn -M "$candidate" >/dev/null 2>&1; then
+          efi_sys_mount_point=$candidate
+          break
+        fi
+      done
+    fi
+    [ -n "$efi_sys_mount_point" ] || fail \
+      "UEFI detected, but no EFI partition is mounted at /boot or /boot/efi"
+    grub_device=nodev
+    say "Detected UEFI boot with EFI partition at $efi_sys_mount_point"
+    ;;
+  bios)
+    efi_sys_mount_point=/boot
+    grub_device=${GRUB_DEVICE:-}
+    if [ -z "$grub_device" ]; then
+      root_source=$(findmnt -nro SOURCE / | sed 's/\[.*$//')
+      root_device=$(readlink -f "$root_source" 2>/dev/null || true)
+      if [ -n "$root_device" ]; then
+        grub_device=$(lsblk -sno PATH,TYPE "$root_device" 2>/dev/null \
+          | awk '$2 == "disk" { print $1; exit }')
+      fi
+    fi
+    [ -n "$grub_device" ] || fail \
+      "BIOS detected, but the root disk could not be determined; set GRUB_DEVICE=/dev/your-disk"
+    [ -b "$grub_device" ] || fail "GRUB device is not a block device: $grub_device"
+    say "Detected BIOS boot; GRUB will be installed to $grub_device"
+    ;;
+  *)
+    fail "Unsupported BOOT_MODE '$boot_mode'; expected uefi or bios"
+    ;;
+esac
+
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 install_dir=${NIX_CONFIG_DIR:-$target_home/.config/nixos}
 timestamp=$(date +%Y%m%d-%H%M%S)
@@ -85,6 +131,9 @@ cat >"$identity_tmp" <<EOF
   homeDirectory = "$(escape_nix_string "$target_home")";
   hostName = "$(escape_nix_string "$host_name")";
   system = "$target_system";
+  bootMode = "$boot_mode";
+  efiSysMountPoint = "$(escape_nix_string "$efi_sys_mount_point")";
+  grubDevice = "$(escape_nix_string "$grub_device")";
   timeZone = "America/Los_Angeles";
   systemStateVersion = "26.05";
   homeStateVersion = "25.11";

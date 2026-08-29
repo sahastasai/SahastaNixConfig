@@ -1,4 +1,9 @@
-{ pkgs, identity, ... }:
+{
+  identity,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   nix.settings.experimental-features = [
@@ -7,9 +12,22 @@
   ];
 
   boot = {
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
     kernelPackages = pkgs.linuxPackages_latest;
+    loader = lib.mkMerge [
+      (lib.mkIf (identity.bootMode == "uefi") {
+        systemd-boot.enable = true;
+        efi = {
+          canTouchEfiVariables = true;
+          efiSysMountPoint = identity.efiSysMountPoint;
+        };
+      })
+      (lib.mkIf (identity.bootMode == "bios") {
+        grub = {
+          enable = true;
+          device = identity.grubDevice;
+        };
+      })
+    ];
   };
 
   networking = {

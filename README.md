@@ -16,8 +16,9 @@ The installer detects the invoking user, passwd-database home directory,
 hostname, architecture, and current hardware. It installs a working copy at
 `~/.config/nixos`, writes `identity.nix`, regenerates the target machine's
 `hardware-configuration.nix`, bootstraps the `nix-command` and `flakes`
-features when the existing system has not enabled them yet, validates the
-flake, and runs `nixos-rebuild`.
+features when the existing system has not enabled them yet, selects
+systemd-boot for UEFI or GRUB for legacy BIOS, validates the flake, and runs
+`nixos-rebuild`.
 
 The flake output name remains `sahasta` on every machine:
 
@@ -36,6 +37,10 @@ CODEX_ARCHIVE=/path/to/codex-chats.tar.zst sh install.sh
 Use `DRY_RUN=1` to generate and validate an adapted copy without changing the
 running system. The installer preserves any existing KeePassXC preferences as
 local, mode-0600 state because that file can contain a private sharing key.
+Boot detection can be overridden with `BOOT_MODE=uefi` plus
+`EFI_SYS_MOUNT_POINT=/boot/efi`, or with `BOOT_MODE=bios` plus
+`GRUB_DEVICE=/dev/sdX`. The BIOS target must be the whole disk, not a numbered
+partition.
 
 ## Layout
 
