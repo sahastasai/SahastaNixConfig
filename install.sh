@@ -55,6 +55,9 @@ if [ -f "$keepass_path" ]; then
   mkdir -p "$(dirname "$keepass_backup")"
   cp -L "$keepass_path" "$keepass_backup"
   chmod 600 "$keepass_backup"
+  if [ "$(id -u)" -eq 0 ]; then
+    chown "$target_user:$(id -gn "$target_user")" "$keepass_backup"
+  fi
 fi
 
 if [ "$script_dir" != "$install_dir" ]; then
@@ -122,6 +125,9 @@ if [ -n "$keepass_backup" ]; then
   fi
   cp "$keepass_backup" "$keepass_path"
   chmod 600 "$keepass_path"
+  if [ "$(id -u)" -eq 0 ]; then
+    chown "$target_user:$(id -gn "$target_user")" "$keepass_path"
+  fi
   say "Preserved local KeePassXC preferences outside Git management"
 fi
 
