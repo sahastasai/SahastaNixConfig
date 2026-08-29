@@ -1,0 +1,45 @@
+default_from = "sahasta@saimithrallc.com"
+gmail = []
+
+[mail_app]
+base_url = "https://mail.sahastasai.com"
+domains = [
+    "sahastasai.com",
+    "sahanavsai.com",
+    "sahasta.com",
+    "ordinmed.com",
+    "hydroterrace.com",
+    "koinos.industries",
+    "drbrisk.com",
+    "terraceoflife.com",
+    "sai.house",
+    "lasselle.house",
+]
+
+[[smtp]]
+name = "zoho"
+email = "sahasta@saimithrallc.com"
+username = "sahasta@saimithrallc.com"
+smtp_host = "smtp.zoho.com"
+smtp_port = 465
+imap_host = "imap.zoho.com"
+imap_port = 993
+record_to_mail_app = true
+
+[[himalaya]]
+name = "zoho"
+email = "sahasta@saimithrallc.com"
+record_to_mail_app = true
+
+[codex]
+enabled = true
+monitored_recipients = [
+    "codex@hydroterrace.com",
+    "codex@koinos.industries",
+    "codex@sahastasai.com",
+]
+approval_email = "me@sahastasai.com"
+notification_from = "codex@hydroterrace.com"
+allowed_senders = ["me@sahastasai.com"]
+workspace = "@HOME@/Development"
+not_before_ms = 1783741094128

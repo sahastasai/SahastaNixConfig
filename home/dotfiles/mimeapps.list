@@ -1,0 +1,6 @@
+[Default Applications]
+x-scheme-handler/webcal=helium.desktop
+x-scheme-handler/mailto=helium.desktop
+x-scheme-handler/codex=ChatGPT.desktop
+
+[Added Associations]
