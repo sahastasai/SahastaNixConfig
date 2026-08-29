@@ -20,11 +20,15 @@ features when the existing system has not enabled them yet, selects
 systemd-boot for UEFI or GRUB for legacy BIOS, validates the flake, and runs
 `nixos-rebuild`.
 
-The flake output name remains `sahasta` on every machine:
+After the first installation, the installer registers this checkout as the
+default system flake. Future rebuilds need only:
 
 ```sh
-sudo nixos-rebuild switch --flake "path:$HOME/.config/nixos#sahasta"
+sudo nixos-rebuild switch
 ```
+
+An existing `/etc/nixos/flake.nix` is preserved with a timestamped backup. The
+flake also retains the explicit `sahasta` output for recovery and scripting.
 
 Set `NIX_CONFIG_DIR` to choose another installation directory. Set
 `KEEP_HARDWARE_CONFIG=1` only when deliberately reusing the checked-in hardware

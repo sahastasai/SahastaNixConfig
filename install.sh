@@ -167,6 +167,23 @@ sudo nixos-rebuild switch \
   --option experimental-features "nix-command flakes" \
   --flake "$flake_ref#sahasta"
 
+system_flake_link=/etc/nixos/flake.nix
+system_flake_target="$install_dir/flake.nix"
+sudo mkdir -p /etc/nixos
+if sudo test -e "$system_flake_link" || sudo test -L "$system_flake_link"; then
+  existing_flake_target=$(sudo readlink -f "$system_flake_link" 2>/dev/null || true)
+  if [ "$existing_flake_target" != "$system_flake_target" ]; then
+    system_flake_backup="$system_flake_link.backup-$timestamp"
+    say "Saving existing default flake as $system_flake_backup"
+    sudo mv "$system_flake_link" "$system_flake_backup"
+  fi
+fi
+if ! sudo test -L "$system_flake_link"; then
+  sudo ln -s "$system_flake_target" "$system_flake_link"
+fi
+say "Registered $install_dir as the default NixOS flake"
+say "Future rebuilds: sudo nixos-rebuild switch"
+
 if [ -n "$keepass_backup" ]; then
   mkdir -p "$(dirname "$keepass_path")"
   if [ -L "$keepass_path" ]; then

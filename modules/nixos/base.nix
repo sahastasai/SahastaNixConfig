@@ -11,6 +11,14 @@
     "flakes"
   ];
 
+  # `sudo nixos-rebuild` evaluates the user-owned default flake as root. Trust
+  # only this exact checkout so libgit2 accepts it without weakening Git's
+  # ownership checks globally.
+  programs.git = {
+    enable = true;
+    config.safe.directory = "${identity.homeDirectory}/.config/nixos";
+  };
+
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     loader = lib.mkMerge [

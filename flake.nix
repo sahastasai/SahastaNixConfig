@@ -21,9 +21,7 @@
     }:
     let
       identity = import ./identity.nix;
-    in
-    {
-      nixosConfigurations.sahasta = nixpkgs.lib.nixosSystem {
+      systemConfiguration = nixpkgs.lib.nixosSystem {
         system = identity.system;
         specialArgs = { inherit inputs identity; };
         modules = [
@@ -39,6 +37,15 @@
             };
           }
         ];
+      };
+    in
+    {
+      nixosConfigurations = {
+        default = systemConfiguration;
+        sahasta = systemConfiguration;
+      }
+      // {
+        ${identity.hostName} = systemConfiguration;
       };
 
       formatter.${identity.system} = nixpkgs.legacyPackages.${identity.system}.nixfmt;
