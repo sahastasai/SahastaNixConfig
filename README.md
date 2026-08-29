@@ -15,7 +15,9 @@ sh install.sh
 The installer detects the invoking user, passwd-database home directory,
 hostname, architecture, and current hardware. It installs a working copy at
 `~/.config/nixos`, writes `identity.nix`, regenerates the target machine's
-`hardware-configuration.nix`, validates the flake, and runs `nixos-rebuild`.
+`hardware-configuration.nix`, bootstraps the `nix-command` and `flakes`
+features when the existing system has not enabled them yet, validates the
+flake, and runs `nixos-rebuild`.
 
 The flake output name remains `sahasta` on every machine:
 

@@ -94,7 +94,7 @@ mv "$identity_tmp" "$install_dir/identity.nix"
 
 if [ "${DRY_RUN:-0}" = 1 ]; then
   say "Validating the adapted flake without activating it"
-  nix flake check "$flake_ref"
+  nix --extra-experimental-features "nix-command flakes" flake check "$flake_ref"
   say "Dry run complete. Adapted configuration: $install_dir"
   exit 0
 fi
@@ -111,10 +111,12 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 
 say "Validating the flake"
-nix flake check "$flake_ref"
+nix --extra-experimental-features "nix-command flakes" flake check "$flake_ref"
 
 say "Activating NixOS and integrated Home Manager"
-sudo nixos-rebuild switch --flake "$flake_ref#sahasta"
+sudo nixos-rebuild switch \
+  --option experimental-features "nix-command flakes" \
+  --flake "$flake_ref#sahasta"
 
 if [ -n "$keepass_backup" ]; then
   mkdir -p "$(dirname "$keepass_path")"
