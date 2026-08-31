@@ -19,6 +19,13 @@
     config.safe.directory = "${identity.homeDirectory}/.config/nixos";
   };
 
+  # nixos-rebuild-ng automatically uses a flake when this conventional entry
+  # exists. It resolves the link before evaluating, so relative imports still
+  # come from the complete Home Manager-integrated checkout.
+  systemd.tmpfiles.rules = [
+    "L+ /etc/nixos/flake.nix - - - - ${identity.homeDirectory}/.config/nixos/flake.nix"
+  ];
+
   boot = {
     kernelPackages = pkgs.linuxPackages_latest;
     loader = lib.mkMerge [

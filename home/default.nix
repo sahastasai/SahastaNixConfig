@@ -115,6 +115,7 @@ in
     zip
     zellij
     zstd
+    zulu21
     changeBrightness
   ];
 
