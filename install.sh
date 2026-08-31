@@ -164,6 +164,7 @@ nix --extra-experimental-features "nix-command flakes" flake check "$flake_ref"
 
 say "Activating NixOS and integrated Home Manager"
 sudo nixos-rebuild switch \
+  --no-reexec \
   --option experimental-features "nix-command flakes" \
   --flake "$flake_ref#sahasta"
 
